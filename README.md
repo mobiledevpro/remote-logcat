@@ -20,7 +20,7 @@ Android Library for remote debugging service (remote logcat)
    
    ```
    	dependencies {
-   	        compile 'com.github.mobile-dev-pro:commons-ui:VERSION'
+   	        compile 'com.github.mobile-dev-pro:remote-logcat:VERSION'
    	}
 
 3. Init library in the main application class in onCreate() method:
