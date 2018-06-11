@@ -12,7 +12,8 @@ import android.util.Log;
  * Created by Dmitriy V. Chernysh on 23.09.17.
  * dmitriy.chernysh@gmail.com
  * <p>
- * https://fb.me/mobiledevpro/
+ * https://instagr.am/mobiledevpro
+ * https://github.com/dmitriy-chernysh
  * <p>
  * #MobileDevPro
  */

@@ -26,7 +26,8 @@ import java.util.ArrayList;
  * Created by Dmitriy V. Chernysh on 23.09.17.
  * dmitriy.chernysh@gmail.com
  * <p>
- * https://fb.me/mobiledevpro/
+ * https://instagr.am/mobiledevpro
+ * https://github.com/dmitriy-chernysh
  * <p>
  * #MobileDevPro
  */
@@ -39,27 +40,29 @@ class NetworkHelper extends AsyncTask<Void, Void, Boolean> {
 
     private Context mContext;
     private String mToken;
-    private ArrayList<LogEntryModel> mLogEntriesList;
-    private int[] mEntriesIds;
+    private LogEntryModel mLogEntry;
+    private int[] mEntriesIds = new int[0];
     private NetworkConnectionReceiver mNetworkConnectionReceiver;
+    private DBHelper mDbHelper;
 
-    NetworkHelper(Context context, String token, ArrayList<LogEntryModel> logEntriesList, NetworkConnectionReceiver networkConnectionReceiver) {
+    NetworkHelper(Context context,
+                  String token,
+                  LogEntryModel logEntry,
+                  NetworkConnectionReceiver networkConnectionReceiver) {
         mContext = context;
         mToken = token;
-        mLogEntriesList = logEntriesList;
+        mLogEntry = logEntry;
         mNetworkConnectionReceiver = networkConnectionReceiver;
-
-        if (mLogEntriesList != null && !mLogEntriesList.isEmpty()) {
-            mEntriesIds = new int[mLogEntriesList.size()];
-            for (int i = 0, j = mLogEntriesList.size(); i < j; i++) {
-                mEntriesIds[i] = mLogEntriesList.get(i).getId();
-            }
-        }
+        mDbHelper = DBHelper.getInstance(context);
     }
 
 
     @Override
     protected Boolean doInBackground(Void... params) {
+        //save log entry into db
+        if (mLogEntry != null)
+            mDbHelper.insertLogEntry(mLogEntry);
+
         if (!Constants.isDeviceOnline(mContext)) {
             if (mNetworkConnectionReceiver != null) {
                 mContext.registerReceiver(mNetworkConnectionReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
@@ -75,13 +78,21 @@ class NetworkHelper extends AsyncTask<Void, Void, Boolean> {
             }
         }
 
-        if (mLogEntriesList == null || mLogEntriesList.isEmpty()) return false;
+        //select all log entries to send
+        ArrayList<LogEntryModel> logEntriesList = mDbHelper.selectLogEntriesList();
+        if (logEntriesList == null || logEntriesList.isEmpty()) return false;
 
-        //change status for selected entries
-        DBHelper.getInstance(mContext).updateEntriesStatus(mEntriesIds, true);
+        mEntriesIds = new int[logEntriesList.size()];
+        for (int i = 0, j = logEntriesList.size(); i < j; i++) {
+            mEntriesIds[i] = logEntriesList.get(i).getId();
+        }
+
+        //set status to "sending = true" for selected entries
+        if (mEntriesIds.length > 0)
+            mDbHelper.updateEntriesStatus(mEntriesIds, true);
 
         //create json body
-        JSONArray jsonArray = createRequestBody();
+        JSONArray jsonArray = createRequestBody(logEntriesList);
         if (jsonArray == null || jsonArray.length() == 0) return false;
 
         //send entries to server
@@ -90,17 +101,18 @@ class NetworkHelper extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean aBoolean) {
-        DBHelper dbHelper = DBHelper.getInstance(mContext);
         if (aBoolean) {
             //remove entries from the local database
-            dbHelper.deleteLogEntryList(mEntriesIds);
+            if (mEntriesIds.length > 0)
+                mDbHelper.deleteLogEntryList(mEntriesIds);
         } else {
-            //change status for selected entries
-            dbHelper.updateEntriesStatus(mEntriesIds, false);
+            //change status to "sending = false" for selected entries
+            if (mEntriesIds.length > 0)
+                mDbHelper.updateEntriesStatus(mEntriesIds, false);
         }
     }
 
-    private JSONArray createRequestBody() {
+    private JSONArray createRequestBody(ArrayList<LogEntryModel> logEntriesList) {
         JSONArray jsonArray = new JSONArray();
 
         JSONObject jsonEntry;
@@ -109,7 +121,7 @@ class NetworkHelper extends AsyncTask<Void, Void, Boolean> {
         AppInfoModel appInfo;
         UserInfoModel appUserInfo;
         try {
-            for (LogEntryModel logEntry : mLogEntriesList) {
+            for (LogEntryModel logEntry : logEntriesList) {
                 jsonEntry = new JSONObject();
                 jsonEntry.put("datetime", logEntry.getDateTimeTxt());
                 jsonEntry.put("loglevel", logEntry.getLogLevelTxt());

@@ -11,7 +11,8 @@ import android.util.Log;
  * Created by Dmitriy V. Chernysh on 23.09.17.
  * dmitriy.chernysh@gmail.com
  * <p>
- * https://fb.me/mobiledevpro/
+ * https://instagr.am/mobiledevpro
+ * https://github.com/dmitriy-chernysh
  * <p>
  * #MobileDevPro
  */
@@ -31,36 +32,60 @@ public class RemoteLog {
 
     public static void setUserInfo(UserInfoModel userInfo) {
         if (sLogManager == null) return;
-        sLogManager.setUserInfo(userInfo);
+        try {
+            sLogManager.setUserInfo(userInfo);
+        } catch (Exception e) {
+            //do nothing
+        }
     }
 
     public static void d(String tag, String msg) {
         if (isTokenEmpty()) return;
         if (sLogManager == null) return;
-        sLogManager.send(Constants.LOG_LEVEL_DEBUG, tag, msg, null);
+        try {
+            sLogManager.send(Constants.LOG_LEVEL_DEBUG, tag, msg, null);
+        } catch (Exception e) {
+            //do nothing
+        }
     }
 
     public static void d(String tag, String msg, Throwable tr) {
         if (isTokenEmpty()) return;
         if (sLogManager == null) return;
-        sLogManager.send(Constants.LOG_LEVEL_DEBUG, tag, msg, tr);
+        try {
+            sLogManager.send(Constants.LOG_LEVEL_DEBUG, tag, msg, tr);
+        } catch (Exception e) {
+            //do nothing
+        }
     }
 
     public static void e(String tag, String msg) {
         if (isTokenEmpty()) return;
         if (sLogManager == null) return;
-        sLogManager.send(Constants.LOG_LEVEL_ERROR, tag, msg, null);
+        try {
+            sLogManager.send(Constants.LOG_LEVEL_ERROR, tag, msg, null);
+        } catch (Exception e) {
+            //do nothing
+        }
     }
 
     public static void e(String tag, String msg, Throwable tr) {
         if (isTokenEmpty()) return;
         if (sLogManager == null) return;
-        sLogManager.send(Constants.LOG_LEVEL_ERROR, tag, msg, tr);
+        try {
+            sLogManager.send(Constants.LOG_LEVEL_ERROR, tag, msg, tr);
+        } catch (Exception e) {
+            //do nothing
+        }
     }
 
     static void resendLogs() {
         if (sLogManager == null) return;
-        sLogManager.reSendLogs();
+        try {
+            sLogManager.reSendLogs();
+        } catch (Exception e) {
+            //do nothing
+        }
     }
 
     private static boolean isTokenEmpty() {

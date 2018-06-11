@@ -10,7 +10,7 @@ import android.os.AsyncTask;
  * <p>
  * Created by Dmitriy V. Chernysh on 07.03.18.
  * <p>
- * https://fb.com/mobiledevpro/
+ * https://instagr.am/mobiledevpro
  * https://github.com/dmitriy-chernysh
  * #MobileDevPro
  */

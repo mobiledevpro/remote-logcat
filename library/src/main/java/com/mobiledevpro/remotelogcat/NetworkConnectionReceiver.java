@@ -11,7 +11,8 @@ import android.net.ConnectivityManager;
  * Created by Dmitriy V. Chernysh on 03.10.17.
  * dmitriy.chernysh@gmail.com
  * <p>
- * https://fb.me/mobiledevpro/
+ * https://instagr.am/mobiledevpro
+ * https://github.com/dmitriy-chernysh
  * <p>
  * #MobileDevPro
  */
